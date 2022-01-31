@@ -1,0 +1,47 @@
+---
+title: "Glassdoor Income Inequality Analysis"
+subtitle: "Exploring the relationships between various factors such as gender, income, seniority, age, education"
+author: "Abigail Chen"
+prettydoc::html_pretty:
+    theme: leonids
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+##Cleaning the environment
+rm(list=ls())
+
+##Loading the packages
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(kableExtra)
+library(modelsummary)
+library(DataExplorer)
+library(lspline)
+library(huxtable)
+library(ggthemes)
+library(estimatr)
+library(forecast)
+library(tidyverse)
+library(caret) 
+library(ggplot2)
+library(forecast)
+library(flexmix)
+library(kableExtra)
+options(scipen=999)
+```
+
+```{r, echo=FALSE}
+#Importing the data
+df <- read_csv('https://github.com/abigailchristinechen/da2/blob/main/term_project/data/Glassdoor_data.csv')
+```
+
+## Research Questions
+
+How much do working women make compared to working men? Do we have analytical evidence surrounding the issue of salary inequality? What causes these inequalities? How is pay affected by various factors as seen in Glassdoor? How does seniority affect the wage? Can working women bridge the wage gap by getting more education?
+
+
+
+
