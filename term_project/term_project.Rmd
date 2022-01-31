@@ -31,11 +31,9 @@ library(forecast)
 library(flexmix)
 library(kableExtra)
 options(scipen=999)
-```
 
-```{r, echo=FALSE}
 #Importing the data
-df <- read_csv('https://github.com/abigailchristinechen/da2/blob/main/term_project/data/Glassdoor_data.csv')
+df <- read_csv('/Users/abigailchristinechen/da2/term_project/data/Glassdoor_data.csv')
 ```
 
 ## Research Questions
@@ -55,7 +53,56 @@ According to the Workplace Gender Equality Agency (WGEA), the gender pay gap is 
 Equality whether, socially, legally, mentally and even financially on the bases of gender are basic human rights, it's meant to be a equal for everyone. This is important in sending a positive message about an organization's values that are aligned with creating compensation systems that are transparent, fair and rewarding.  This can then lead to attracting better employees, improving employee retention, and building a healthy company culture.  
 
 
+## Data
+The dataset can be found in **Kaggle**(https://www.kaggle.com/nilimajauhari/glassdoor-analyze-gender-pay-gap).
 
 
+```{r echo = FALSE, message = FALSE, include = FALSE}
+head(df)
+```
+
+## Exploratory Data Analysis
+
+### Data Munging
+  
+We can begin by looking at the summary of our data, and checking for NA's.  We have 1,000 observations.  There are no NA's.  Next, we can check out the structure of the dataset we are exploring, so that we can fix it to the correct data format.
+
+###### Check the summary of the Data
+
+```{r , echo=FALSE}
+summary(df)
+```
+
+###### Check the structure of the Data
+
+```{r, echo=FALSE}
+s = str(df)
+```
+
+###### Correcting the data formats  
+```{r , include=FALSE}
+#	Data cleaning and munging  
+## changing the data type to correct format
+df$JobTitle = as.factor(df$JobTitle)
+df$Gender = as.factor(df$Gender)
+df$Education = as.factor(df$Education)
+df$Dept = as.factor(df$Dept)
+df$PerfEval = as.factor(df$PerfEval)
+df$Seniority = as.factor(df$Seniority)
+```
+
+### Variables Selection
+
+Below is the list of shortlisted variables chosen.
+
+1. **NetIncome**: A new variable was created 'NetIncome'. It is equal to BasePay + Bonus. This is our dependent variable and gives the right depiction of net income of an individual compared to base pay alone.
+
+2. **Gender**: Gives information regarding the NetIncome based on gender of a person, whether male or female. 
+
+3. **Seniority**: This shows how long a person has been in the job and how it affects the net income, with values 1-5.
+
+4. **Dept**: It shows difference in the salary of different departments, ranging from operations, management, administration, sales, and engineering.
+
+5. **Education**: This shows how the income of an individual changes based on level of their education, whether they finished high school, college, masters or PHD.
 
 
