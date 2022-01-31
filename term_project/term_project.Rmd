@@ -2,9 +2,9 @@
 title: "Glassdoor Income Inequality Analysis"
 subtitle: "Exploring the relationships on how various factors such as gender, income, seniority, age, education affect income and bonus"
 author: "Abigail Chen"
-output:
-  html_document: default
-  pdf_document: default
+prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
 ---
 
 ```{r setup, include=FALSE}
@@ -34,7 +34,7 @@ library(kableExtra)
 options(scipen=999)
 
 #Importing the data
-df <- read_csv('/Users/abigailchristinechen/da2/term_project/data/Glassdoor_data.csv')
+df <- read_csv('https://raw.githubusercontent.com/abigailchristinechen/da2/main/term_project/data/Glassdoor_data.csv')
 ```
 
 ## Research Questions
@@ -56,7 +56,7 @@ Equality whether, socially, legally, mentally and even financially on the bases 
 
 
 ## Data
-The dataset can be found in **Kaggle**(https://www.kaggle.com/nilimajauhari/glassdoor-analyze-gender-pay-gap).
+The dataset can be found in **Kaggle** (https://www.kaggle.com/nilimajauhari/glassdoor-analyze-gender-pay-gap).
 
 
 ```{r echo = FALSE, message = FALSE, include = FALSE}
@@ -164,7 +164,7 @@ quantile(df$NetIncome)
 table(df$Gender)
 ```
 
-### Analyzing Gender with respect to Net Income
+### Analyzing Gender vs Net Income
 Here in Figure 2, The box plot shows that overall, working males have more net income compared to working females. Using the ANOVA test, we can see that there is a significant difference in net income of the two genders. However, we need to look at other factors as well.
 
 ANOVA Results
@@ -184,8 +184,8 @@ ggplot( data = df, aes(x = Gender ,y = NetIncome, color = Gender  )) +
   geom_boxplot( )
 ```
 
-### Analyzing Age with respect to Net Income
 
+### Analyzing Age vs Net Income
 
 **Figure 3 - Age vs Net Income**
 Here, in Figure 3, both the scatter plot and pearson correlation shows that age doesn't seem to play a significant role when it comes to a person's net income.
@@ -202,6 +202,7 @@ ggplot( data = df, aes(x = Age ,y = NetIncome,color = Gender  )) +
 # https://libguides.library.kent.edu/spss/pearsoncorr
 cor(df$NetIncome,df$Age)
 ```
+
 
 ### Analyzing Education vs Net Income
 Here in Figure 4, we can see that someone with a higher education level has higher the net income, as shown in the boxplot and the ANOVA.  Looking at Figure 5, we can see that gender, education and net income analyses show that for any level of education Male have higher net income compared to the females.
@@ -274,7 +275,7 @@ ggplot( data = df, aes(x = Seniority ,y = NetIncome, color = Seniority)) +
   geom_boxplot( )
 ```
 
-**Figure 9 - Seniority vs NetIncome**
+**Figure 9 - Seniority vs NetIncome vs Gender**
 ```{r ,echo=FALSE, fig.show='hide'}
 ggplot( data = df, aes(x = Seniority ,y = NetIncome,color = Gender  )) + 
   ggtitle('Figure 9: Seniority vs Net Income vs Gender')
@@ -342,13 +343,16 @@ Model3 = lm(Formula3,train)
 summary(Model3)
 ```
 
-4. **Model_4**: For this model, Gender, Education, Departmentt along with Seniority have been considered. It shows that Seniority2 has on average 8252.0 more salary and Seniority5 has on average 37345.0 more. 
+4. **Model_4**: For this model, Gender, Education, Department along with Seniority have been considered. It shows that Seniority2 has on average 8252.0 more salary and Seniority5 has on average 37345.0 more. 
+
+
 
 ```{r,echo=FALSE }
 ## Model Training
 Model4 = lm(Formula4,train)
 summary(Model4)
 ```
+
 
 ```{r,echo=FALSE }
 ## On Train data
@@ -419,10 +423,330 @@ mean of Bonus
 ```{r,echo=FALSE}
 mean(df$Bonus)
 ```
-quantile of NetIncome
+quantile of Bonus
 ```{r,echo=FALSE}
 quantile(df$Bonus)
 ```
+
+### Analyzing Gender vs Bonus
+Here in Figure 11, The box plot shows that overall, males and females receive almost equal bonus on average. In the ANOVA result, it clearly shows that there is no significant difference in bonus of the two genders. 
+
+ANOVA Results
+```{r ,echo=FALSE}
+ANOVABonusGender <- aov(Bonus ~ Gender, data = df)
+summary(ANOVABonusGender)
+```
+
+**Figure 11 - Gender vs Bonus**
+
+```{r ,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Gender ,y = Bonus, color = Gender  )) +
+    ggtitle( "Figure 11: Gender vs Bonus" ) +
+  geom_boxplot( )
+```
+
+
+### Analyzing Age vs Bonus
+**Figure 12 - Age vs Bonus**
+Here, in Figure 12, both the scatter plot and pearson correlation shows that age doesn't seem to play a significant role when it comes to a person's bonus.
+
+```{r,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Age ,y = Bonus,color = Gender  )) + 
+  ggtitle( "Figure 12: Age vs Bonus" ) +
+  geom_point( )
+```
+
+```{r,echo=FALSE }
+# Trying Pearson Correlation in addition to the scatterplot
+# https://libguides.library.kent.edu/spss/pearsoncorr
+cor(df$Bonus,df$Age)
+```
+
+
+### Analyzing Education vs Bonus
+Here in Figure 13, we can see that someone with a higher education level has higher the net income, as shown in the boxplot and the ANOVA.  Looking at Figure 14, we can see that for High School Education females receive slightly higher bonuses, but for college, Masters and PhD education it is almost the same regardless of gender.
+
+**Figure 13 - Education vs Bonus**
+```{r,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Education ,y = Bonus, color = Education)) + 
+  ggtitle('Figure 13: Education vs. Bonus') +
+  geom_boxplot()
+```
+
+ANOVA Results
+
+```{r,echo=FALSE }
+ANOVABonusEducation <- aov(Bonus ~ Education, data = df)
+
+summary(ANOVABonusEducation)
+```
+
+**Figure 14 - Education vs Bonus vs Gender**
+
+```{r,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Education ,y = Bonus,color = Gender  )) + 
+  ggtitle('Figure 14: Education vs Bonus vs Gender') +
+  geom_boxplot( )
+```
+
+### Analyzing Department vs Bonus
+The Figure 15 box plot shows that there's some slight differences in salaries for different departments, while the anova results show that different departments have different pay. While in Figure 16, we can see that in sales and operations females receive more bonuses. While for engineering, administration and management males receive more bonuses.
+
+## Box plot shows that there is minor difference in bounus of different departments 
+
+**Figure 15 - Department vs Bonus**
+```{r ,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Dept ,y = Bonus, color = Dept)) + 
+  ggtitle('Figure 15: Department vs Bonus') +
+  geom_boxplot( )
+```
+
+```{r ,echo=FALSE}
+ANOVABonusDept <- aov(Bonus ~ Dept, data = df)
+
+summary(ANOVABonusDept)
+```
+
+**Figure 16 - Department vs Bonus vs Gender**
+
+```{r,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Dept ,y = Bonus,color = Gender  )) + 
+  ggtitle('Figure 16: Department vs Bonus vs Gender') +
+  geom_boxplot( )
+```
+
+
+### Analyzing Seniority vs Bonus
+In Figure 17, we'll see that the higher the seniority the higher the bonus, as also concluded with the ANOVA results
+ANOVA Results.  Figure 18 box plot shows that being more senior means more bonus.  In the various seniority levels, both genders have relatively equal bonuses. 
+
+```{r ,echo=FALSE}
+ANOVABonusSeniority <- aov(Bonus ~ Seniority, data = df)
+
+summary(ANOVABonusSeniority)
+```
+
+**Figure 17 - Seniority vs Bonus**
+```{r ,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Seniority ,y = Bonus, color = Seniority )) + 
+  ggtitle('Figure 17: Seniority vs Bonus') +
+  geom_boxplot( )
+```
+
+**Figure 18 - Seniority vs Bonus vs Gender**
+```{r ,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Seniority ,y = Bonus, color = Gender  )) + 
+  ggtitle('Figure 18: Seniority vs Bonus vs Gender') +
+  geom_boxplot( )
+```
+
+```{r ,echo=FALSE}
+## Train Test data division 80-20
+set.seed(100)
+n = nrow(df)
+trainIndex = sample(1:n, size = round(0.8*n), replace=FALSE)
+train = df[trainIndex ,]
+test = df[-trainIndex ,]
+```
+
+
+### Regression Models
+
+$$bonus=\beta_0+\beta_1(Gender) $$
+$$bonus=\beta_0+\beta_1(Gender)+\beta_2(Seniority) $$
+$$bonus=\beta_0+\beta_1(Gender)+\beta_2(Seniority)+\beta_3(Dept) $$
+$$bonus=\beta_0+\beta_1(Gender)+\beta_2(Seniority)+\beta_3(Dept)+\beta_4(Education) $$
+```{r ,echo=FALSE}
+Formula5 = as.formula(Bonus~Gender)
+Formula6 = as.formula(Bonus~Gender+Seniority)
+Formula7 = as.formula(Bonus~Gender+Education+Dept)
+Formula8 = as.formula(Bonus~Gender+Seniority+Dept+Education)
+```
+
+1. **Model_5**: shows relative change in bonus with a change in Gender. 
+
+Summary of the model shows that the average bonus for males is estimated to be -61.33 lower than females, whereas males are estimated a total of 95696 + 9647 = 105343. The p-value for the gender Male is very high (greater than 0.05) so its not significant. Looks like there is no statistical evidence of a difference in average bonus between the genders.
+
+```{r,echo=FALSE }
+## Model Training
+
+Model5 = lm(Formula5,train)
+summary(Model5)
+```
+2. **Model_6**: shows relative change in Bonus with a change in Gender as well as Seniority 
+
+Summary of the model 6 shows that the Seniority level plays a significant role in determining the bonus
+
+```{r,echo=FALSE }
+## Model Training
+
+Model6 = lm(Formula6,train)
+summary(Model6)
+```
+
+3. **Model_7**: For model 7, Gender, Seniority and Departments have been considered. The summary of the model shows that department and education have significant effect on the bonus.  
+
+
+```{r,echo=FALSE }
+## Model Training
+
+Model7 = lm(Formula7,train)
+summary(Model7)
+```
+
+4. **Model_8**: For this model, Gender, Education, Departments and Seniority have been considered. 
+
+```{r,echo=FALSE }
+## Model Training
+Model8 = lm(Formula8,train)
+summary(Model8)
+```
+
+```{r ,echo=FALSE}
+## Model performance on train data
+
+train$PredictM5 = predict(Model5,train)
+ACC5 = accuracy(train$PredictM5,train$Bonus)
+
+train$PredictM6 = predict(Model6,train)
+ACC6 = accuracy(train$PredictM6,train$Bonus)
+
+train$PredictM7 = predict(Model7,train)
+ACC7 = accuracy(train$PredictM7,train$Bonus)
+
+train$PredictM8 = predict(Model8,train)
+ACC8 = accuracy(train$PredictM8,train$Bonus)
+
+TrainDataAccuracyResults2 = data.frame(Model = c("Model 5","Model 6","Model 7","Model 8"),
+                     MPE = c(ACC5[4],ACC6[4],ACC7[4],ACC8[4]),
+                     MAPE = c(ACC5[5],ACC6[5],ACC7[5],ACC8[5])
+                     )
+
+kable(TrainDataAccuracyResults2, 
+      "latex", booktabs = TRUE, 
+      caption = 'Results of the models on train data') %>% kable_styling(latex_options = c("hold_position","scale_down"), font_size = 2)
+
+```
+
+
+
+```{r ,echo=FALSE}
+## Model performance on test data
+
+test$PredictM5 = predict(Model5,test)
+ACC5 = accuracy(test$PredictM5,test$Bonus)
+
+test$PredictM6 = predict(Model6,test)
+ACC6 = accuracy(test$PredictM6,test$Bonus)
+
+test$PredictM7 = predict(Model7,test)
+ACC7 = accuracy(test$PredictM7,test$Bonus)
+
+test$PredictM8 = predict(Model8,test)
+ACC8 = accuracy(test$PredictM8,test$Bonus)
+
+TestDataAccuracyResults2 = data.frame(Model = c("Model 5","Model 6","Model 7","Model 8"),
+                                      MPE = c(ACC5[4],ACC6[4],ACC7[4],ACC8[4]),
+                                      MAPE = c(ACC5[5],ACC6[5],ACC7[5],ACC8[5])
+)
+
+kable(TestDataAccuracyResults2, 
+      "latex", booktabs = TRUE, 
+      caption = 'Results of the models on test data') %>% kable_styling(latex_options = c("hold_position","scale_down"), font_size = 2)
+
+```
+
+#### Alternative model rlm : lm robust
+
+```{r,echo=FALSE }
+
+Model5R = rlm(Formula5,train)
+```
+
+
+```{r,echo=FALSE }
+
+Model6R = rlm(Formula6,train)
+```
+
+
+```{r,echo=FALSE }
+
+Model7R = rlm(Formula7,train)
+```
+
+
+```{r,echo=FALSE }
+Model8R = rlm(Formula8,train)
+```
+
+
+```{r,echo=FALSE }
+## LM Robust Model performance on train data
+
+train$PredictM5R = predict(Model5R,train)
+ACC5R = accuracy(train$PredictM5R,train$Bonus)
+
+train$PredictM6R = predict(Model6R,train)
+ACC6R = accuracy(train$PredictM6R,train$Bonus)
+
+train$PredictM7R = predict(Model7R,train)
+ACC7R = accuracy(train$PredictM7R,train$Bonus)
+
+train$PredictM8R = predict(Model8R,train)
+ACC8R = accuracy(train$PredictM8R,train$Bonus)
+
+TrainDataAccuracyResultsLR2 = data.frame(Model = c("Model 5","Model 6","Model 7","Model 8"),
+                                      MPE = c(ACC5R[4],ACC6R[4],ACC7R[4],ACC8R[4]),
+                                      MAPE = c(ACC5R[5],ACC6R[5],ACC7R[5],ACC8R[5])
+)
+# TrainDataAccuracyResultsLR2
+kable(TrainDataAccuracyResultsLR2, 
+      "latex", booktabs = TRUE, 
+      caption = 'Results of the alternative models (lm robust) on train data') %>% kable_styling(latex_options = c("hold_position","scale_down"), font_size = 2)
+
+```
+
+
+```{r,echo=FALSE }
+## LM Robust Model performance on test data
+
+## Model performance on test data
+
+test$PredictM5R = predict(Model5R,test)
+ACC5R = accuracy(test$PredictM5R,test$Bonus)
+
+test$PredictM6R = predict(Model6R,test)
+ACC6R = accuracy(test$PredictM6R,test$Bonus)
+
+test$PredictM7R = predict(Model7R,test)
+ACC7R = accuracy(test$PredictM7R,test$Bonus)
+
+test$PredictM8R = predict(Model8R,test)
+ACC8R = accuracy(test$PredictM8R,test$Bonus)
+
+TestDataAccuracyResultsLR2 = data.frame(Model = c("Model 5","Model 6","Model 7","Model 8"),
+                                     MPE = c(ACC5R[4],ACC6R[4],ACC7R[4],ACC8R[4]),
+                                     MAPE = c(ACC5R[5],ACC6R[5],ACC7R[5],ACC8R[5])
+)
+
+# TestDataAccuracyResultsLR
+
+kable(TestDataAccuracyResultsLR2, 
+      "latex", booktabs = TRUE, 
+      caption = 'Results of the alternative models (lm robust) on test data') %>% kable_styling(latex_options = c("hold_position","scale_down"), font_size = 2)
+
+```
+
+## Alternative model: lm robust
+
+In robust lm, observations are not treated equally. The weight of each point is adjusted in an iterative process. rlm is less sensitive to outliers, as outliers will get reduced weight compared to simple lm which only tries to reduce the error.
+
+## Conclusion : Part 2
+
+In conclusion, we can say that gender influences bonus of a person. rlm didnt show much differnce mix performance good in some bad in others ... 
+
+
 
 
 
@@ -490,13 +814,13 @@ ggplot( data = df, aes(x = Dept ,y = NetIncome,color = Gender  )) +
   geom_boxplot( )
 ```
 
-```{r ,echo=FALSE, fig.show='hide'}
+```{r ,echo=FALSE}
 ggplot( data = df, aes(x = Seniority ,y = NetIncome, color = Seniority)) + 
   ggtitle('Figure 8: Seniority vs Net Income') +
   geom_boxplot( )
 ```
 
-```{r ,echo=FALSE, fig.show='hide'}
+```{r ,echo=FALSE}
 ggplot( data = df, aes(x = Seniority ,y = NetIncome,color = Gender  )) + 
   ggtitle('Figure 9: Seniority vs Net Income vs Gender')
   geom_boxplot( )
@@ -509,5 +833,50 @@ ggplot( data = df, aes(x = Bonus  )) +
   geom_density( colour="darkcyan" ) 
 ```
 
+```{r ,echo=FALSE}
+ggplot( data = df, aes(x = Gender ,y = Bonus, color = Gender  )) +
+    ggtitle( "Figure 11: Gender vs Net Bonus" ) +
+  geom_boxplot( )
+```
 
+```{r,echo=FALSE}
+ggplot( data = df, aes(x = Age ,y = Bonus,color = Gender  )) + 
+  ggtitle( "Figure 12: Age vs Bonus" ) +
+  geom_point( )
+```
 
+```{r,echo=FALSE}
+ggplot( data = df, aes(x = Education ,y = Bonus, color = Education)) + 
+  ggtitle('Figure 13: Education vs. Bonus') +
+  geom_boxplot()
+```
+
+```{r,echo=FALSE}
+ggplot( data = df, aes(x = Education ,y = Bonus,color = Gender  )) + 
+  ggtitle('Figure 14: Education vs Bonus vs Gender') +
+  geom_boxplot( )
+```
+
+```{r ,echo=FALSE}
+ggplot( data = df, aes(x = Dept ,y = Bonus, color = Dept)) + 
+  ggtitle('Figure 15: Department vs Bonus') +
+  geom_boxplot( )
+```
+
+```{r,echo=FALSE}
+ggplot( data = df, aes(x = Dept ,y = Bonus,color = Gender  )) + 
+  ggtitle('Figure 16: Department vs Bonus vs Gender') +
+  geom_boxplot( )
+```
+
+```{r ,echo=FALSE}
+ggplot( data = df, aes(x = Seniority ,y = Bonus, color = Seniority )) + 
+  ggtitle('Figure 17: Seniority vs Bonus') +
+  geom_boxplot( )
+```
+
+```{r ,echo=FALSE}
+ggplot( data = df, aes(x = Seniority ,y = Bonus, color = Gender  )) + 
+  ggtitle('Figure 18: Seniority vs Bonus vs Gender') +
+  geom_boxplot( )
+```
