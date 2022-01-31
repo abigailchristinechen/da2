@@ -1,10 +1,10 @@
 ---
 title: "Glassdoor Income Inequality Analysis"
-subtitle: "Exploring the relationships between various factors such as gender, income, seniority, age, education"
+subtitle: "Exploring the relationships on how various factors such as gender, income, seniority, age, education affect income and bonus"
 author: "Abigail Chen"
-prettydoc::html_pretty:
-    theme: cayman
-    highlight: github
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -23,6 +23,7 @@ library(lspline)
 library(huxtable)
 library(ggthemes)
 library(estimatr)
+library(MASS)
 library(forecast)
 library(tidyverse)
 library(caret) 
@@ -37,14 +38,15 @@ df <- read_csv('/Users/abigailchristinechen/da2/term_project/data/Glassdoor_data
 ```
 
 ## Research Questions
+Part 1:
+How much do working women make compared to working men? Do we have analytical evidence surrounding the issue of salary inequality? What causes these inequalities? How is pay affected by various factors as seen in Glassdoor? How does seniority affect the wage? Can working women bridge the wage gap by getting more education? 
 
-How much do working women make compared to working men? Do we have analytical evidence surrounding the issue of salary inequality? What causes these inequalities? How is pay affected by various factors as seen in Glassdoor? How does seniority affect the wage? Can working women bridge the wage gap by getting more education?
-
+Part 2: 
+Which gender receives more bonuses men or women? Does seniority play a role in the bonuses a person can receive? Does the years of studying affect the extra pay a person gets?
 
 ## Introduction
 
-According to the Workplace Gender Equality Agency (WGEA), the gender pay gap measures the difference between the average earnings of women and men in the workforce. This is an internationally established measure of working women’s position in our  economy in comparison to working men. This project aims to explore the relationship between salary and gender based on the data from Glassdoor using regression analysis.  For pay we will be looking at the net income and the bonus pay. Additionally, other factors such as age, seniority, level of education of an individual will also be taken into account. 
-
+According to the Workplace Gender Equality Agency (WGEA), the gender pay gap measures the difference between the average earnings of women and men in the workforce. This is an internationally established measure of working women’s position in our  economy in comparison to working men. This project aims to explore the relationship between salary and gender based on the data from Glassdoor using regression analysis.  As well as looking at the relationship between, For pay we will be looking at the net income and the bonus pay. Additionally, other factors such as age, seniority, level of education of an individual will also be taken into account. 
 
 ## Motivation
 
@@ -97,13 +99,15 @@ Below is the list of shortlisted variables chosen.
 
 1. **NetIncome**: A new variable was created 'NetIncome'. It is equal to BasePay + Bonus. This is our dependent variable and gives the right depiction of net income of an individual compared to base pay alone.
 
-2. **Gender**: Gives information regarding the NetIncome based on gender of a person, whether male or female. 
+2. **Bonus**:  This is the additional pay a person receives outside of their BasePay
 
-3. **Seniority**: This shows how long a person has been in the job and how it affects the net income, with values 1-5.
+3. **Gender**: Gives information regarding the NetIncome based on gender of a person, whether male or female. 
 
-4. **Dept**: It shows difference in the salary of different departments, ranging from operations, management, administration, sales, and engineering.
+4. **Seniority**: This shows how long a person has been in the job and how it affects the net income, with values 1-5.
 
-5. **Education**: This shows how the income of an individual changes based on level of their education, whether they finished high school, college, masters or PHD.
+5. **Dept**: It shows difference in the salary of different departments, ranging from operations, management, administration, sales, and engineering.
+
+6. **Education**: This shows how the income of an individual changes based on level of their education, whether they finished high school, college, masters or PHD.
 
 
 ```{r , include=FALSE}
@@ -133,12 +137,12 @@ Table1 <- datasummary ( ( Age ) +
 Table1
 ```
 
-
+# Part 1 : Income vs Various Factors
 **Figure 1 - Distribution of net income**
 
 ```{r,echo=FALSE, fig.show='hide'}
 ggplot( data = df, aes(x = NetIncome  )) + 
-  ggtitle( "Distribution of Net Income" ) +
+  ggtitle( "Figure 1: Distribution of Net Income" ) +
   geom_density( colour="darkcyan" ) 
 
 ```
@@ -176,7 +180,7 @@ summary(ANOVANetIncomeGender)
 
 ```{r ,echo=FALSE, fig.show='hide'}
 ggplot( data = df, aes(x = Gender ,y = NetIncome, color = Gender  )) +
-    ggtitle( "Gender vs Net Income" ) +
+    ggtitle( "Figure 2: Gender vs Net Income" ) +
   geom_boxplot( )
 ```
 
@@ -189,7 +193,7 @@ Here, in Figure 3, both the scatter plot and pearson correlation shows that age 
 ```{r,echo=FALSE, fig.show='hide'}
 
 ggplot( data = df, aes(x = Age ,y = NetIncome,color = Gender  )) + 
-  ggtitle( "Age vs Net Income" ) +
+  ggtitle( "Figure 3: Age vs Net Income" ) +
   geom_point( )
 ```
 
@@ -205,7 +209,7 @@ Here in Figure 4, we can see that someone with a higher education level has high
 **Figure 4 - Education vs Net Income**
 ```{r,echo=FALSE, fig.show='hide'}
 ggplot( data = df, aes(x = Education ,y = NetIncome, color = Education)) + 
-  ggtitle('Education vs. Net Income') +
+  ggtitle('Figure 4: Education vs. Net Income') +
   geom_boxplot()
 ```
 
@@ -223,7 +227,7 @@ summary(ANOVANetIncomeEducation)
 
 ```{r,echo=FALSE, fig.show='hide'}
 ggplot( data = df, aes(x = Education ,y = NetIncome,color = Gender  )) + 
-  ggtitle('Education vs Net Income vs Gender') +
+  ggtitle('Figure 5: Education vs Net Income vs Gender') +
   geom_boxplot( )
 ```
 
@@ -234,7 +238,7 @@ The Figure 6 box plot shows that there's some slight differences in salaries for
 **Figure 6 - Department vs Net Income**
 ```{r ,echo=FALSE, fig.show='hide'}
 ggplot( data = df, aes(x = Dept ,y = NetIncome, color = Dept)) + 
-  ggtitle('Department vs Net Income') +
+  ggtitle('Figure 6: Department vs Net Income') +
   geom_boxplot( )
 ```
 
@@ -249,7 +253,7 @@ summary(ANOVANetIncomeDept)
 
 ```{r,echo=FALSE, fig.show='hide'}
 ggplot( data = df, aes(x = Dept ,y = NetIncome,color = Gender  )) + 
-  ggtitle('Department vs Net Income vs Gender') +
+  ggtitle('Figure 7: Department vs Net Income vs Gender') +
   geom_boxplot( )
 ```
 
@@ -266,14 +270,14 @@ summary(ANOVANetIncomeSeniority)
 **Figure 8 - Seniority vs NetIncome**
 ```{r ,echo=FALSE, fig.show='hide'}
 ggplot( data = df, aes(x = Seniority ,y = NetIncome, color = Seniority)) + 
-  ggtitle('Seniority vs Net Income') +
+  ggtitle('Figure 8: Seniority vs Net Income') +
   geom_boxplot( )
 ```
 
 **Figure 9 - Seniority vs NetIncome**
 ```{r ,echo=FALSE, fig.show='hide'}
 ggplot( data = df, aes(x = Seniority ,y = NetIncome,color = Gender  )) + 
-  ggtitle('Seniority vs Net Income vs Gender')
+  ggtitle('Figure 9: Seniority vs Net Income vs Gender')
   geom_boxplot( )
 ```
 
@@ -305,16 +309,127 @@ Formula4 = as.formula(NetIncome~Gender+Education+Dept+Seniority)
 
 
 
+1. **Model_1**: Shows relative change on Net Income with a change in Gender. 
+
+Summary of the model shows that the average salary for female is estimated to be 95696, whereas males are estimated a total of 95696 + 9647 = 105343. The p-value for the gender Male is very significant, suggesting that there is a statistical evidence of a difference in average salary between the genders.
+
+```{r,echo=FALSE }
+## Model Training
+Model1 = lm(Formula1,train)
+summary(Model1)
+
+```
 
 
+2. **Model_2**: shows relative change on Net Income with a change in Gender as well as Education. 
 
+Summary of the model shows that the Education level of 'High School' earns on average  -1698 less,
+'Masters' 5383 more and 'PhD' 8480 more. While gender still showing significant difference of pay. 
 
+```{r,echo=FALSE }
+## Model Training
+
+Model2 = lm(Formula2,train)
+summary(Model2)
+```
+
+3. **Model_3**: Shows significant effect on Net Income, with a change in Gender as well as Education and Department.
+
+```{r,echo=FALSE }
+## Model Training
+
+Model3 = lm(Formula3,train)
+summary(Model3)
+```
+
+4. **Model_4**: For this model, Gender, Education, Departmentt along with Seniority have been considered. It shows that Seniority2 has on average 8252.0 more salary and Seniority5 has on average 37345.0 more. 
+
+```{r,echo=FALSE }
+## Model Training
+Model4 = lm(Formula4,train)
+summary(Model4)
+```
+
+```{r,echo=FALSE }
+## On Train data
+
+train$PredictM1 = predict(Model1,train)
+ACC1 = accuracy(train$PredictM1,train$NetIncome)
+
+train$PredictM2 = predict(Model1,train)
+ACC2 = accuracy(train$PredictM2,train$NetIncome)
+
+train$PredictM3 = predict(Model3,train)
+ACC3 = accuracy(train$PredictM3,train$NetIncome)
+
+train$PredictM4 = predict(Model4,train)
+ACC4 = accuracy(train$PredictM4,train$NetIncome)
+
+TrainDataAccuracyResults = data.frame(Model = c("Model 1","Model 2","Model 3","Model 4"),
+                     MPE = c(ACC1[4],ACC2[4],ACC3[4],ACC4[4]),
+                     MAPE = c(ACC1[5],ACC2[5],ACC3[5],ACC4[5])
+                     )
+
+kable(TrainDataAccuracyResults, 
+      "latex", booktabs = TRUE, 
+      caption = 'Accuracy results of the models on train data') %>% kable_styling(latex_options = c("hold_position","scale_down"), font_size = 2)
+
+```
+
+```{r ,echo=FALSE}
+
+## Model performance on test data
+
+test$PredictM1 = predict(Model1,test)
+ACC1 = accuracy(test$PredictM1,test$NetIncome)
+
+test$PredictM2 = predict(Model1,test)
+ACC2 = accuracy(test$PredictM2,test$NetIncome)
+
+test$PredictM3 = predict(Model3,test)
+ACC3 = accuracy(test$PredictM3,test$NetIncome)
+
+test$PredictM4 = predict(Model4,test)
+ACC4 = accuracy(test$PredictM4,test$NetIncome)
+
+TestDataAccuracyResults = data.frame(Model = c("Model 1","Model 2","Model 3","Model 4"),
+                                      MPE = c(ACC1[4],ACC2[4],ACC3[4],ACC4[4]),
+                                      MAPE = c(ACC1[5],ACC2[5],ACC3[5],ACC4[5])
+)
+
+kable(TestDataAccuracyResults, 
+      "latex", booktabs = TRUE, 
+      caption = 'Accuracy results of the models on test data') %>% kable_styling(latex_options = c("hold_position","scale_down"), font_size = 2)
+
+```
+
+## Conclusion : for Part 1
+In conclusion, we can say that gender influences the net income of a person.
+
+# Part 2 : Bonus vs Various Factors
+**Figure 10 - Distribution of Bonus**
+
+```{r,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Bonus  )) + 
+  ggtitle( "Figure 10: Distribution of Bonus" ) +
+  geom_density( colour="darkcyan" ) 
+```
+
+mean of Bonus
+```{r,echo=FALSE}
+mean(df$Bonus)
+```
+quantile of NetIncome
+```{r,echo=FALSE}
+quantile(df$Bonus)
+```
 
 
 
 
 
 ## Appendix
+
 Summary of Data
 ```{r , echo=FALSE}
 summary(df)
@@ -324,6 +439,9 @@ Data Format
 ```{r, echo=FALSE, message = FALSE}
 s = str(df)
 ```
+
+
+# Part 1: Income vs Various Factors
 
 ```{r,echo=FALSE}
 # Net Income Distribution 
@@ -382,6 +500,13 @@ ggplot( data = df, aes(x = Seniority ,y = NetIncome, color = Seniority)) +
 ggplot( data = df, aes(x = Seniority ,y = NetIncome,color = Gender  )) + 
   ggtitle('Figure 9: Seniority vs Net Income vs Gender')
   geom_boxplot( )
+```
+
+# Part 2: Bonus vs Other Factors
+```{r,echo=FALSE}
+ggplot( data = df, aes(x = Bonus  )) + 
+  ggtitle( "Figure 10: Distribution of Bonus" ) +
+  geom_density( colour="darkcyan" ) 
 ```
 
 
