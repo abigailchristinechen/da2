@@ -3,7 +3,7 @@ title: "Glassdoor Income Inequality Analysis"
 subtitle: "Exploring the relationships between various factors such as gender, income, seniority, age, education"
 author: "Abigail Chen"
 prettydoc::html_pretty:
-    theme: leonids
+    theme: cayman
     highlight: github
 ---
 
@@ -67,22 +67,22 @@ head(df)
   
 We can begin by looking at the summary of our data, and checking for NA's.  We have 1,000 observations.  There are no NA's.  Next, we can check out the structure of the dataset we are exploring, so that we can fix it to the correct data format.
 
-###### Check the summary of the Data
+###### -Check the summary of the Data
 
-```{r , echo=FALSE}
+```{r , echo=FALSE, message = FALSE, include = FALSE}
 summary(df)
 ```
 
-###### Check the structure of the Data
+###### -Check the structure of the Data
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message = FALSE, include = FALSE}
 s = str(df)
 ```
 
-###### Correcting the data formats  
-```{r , include=FALSE}
+###### -Correct the data formats  
+```{r, echo=FALSE, message = FALSE, include = FALSE }
 #	Data cleaning and munging  
-## changing the data type to correct format
+# Changing the data type to correct format
 df$JobTitle = as.factor(df$JobTitle)
 df$Gender = as.factor(df$Gender)
 df$Education = as.factor(df$Education)
@@ -104,5 +104,285 @@ Below is the list of shortlisted variables chosen.
 4. **Dept**: It shows difference in the salary of different departments, ranging from operations, management, administration, sales, and engineering.
 
 5. **Education**: This shows how the income of an individual changes based on level of their education, whether they finished high school, college, masters or PHD.
+
+
+```{r , include=FALSE}
+## Creating an new variable Net Income (BasePay + Bonus)
+df$NetIncome = df$BasePay + df$Bonus
+
+```
+
+## Descriptive Statistics
+
+Below is the statistical summary of all the numerical variables involved in the data. For age, the youngest one is 18, and the oldest one is 65. The average age is 41. For the basepay, the minimum is \$34,208, and the maximum is \$179,726. The mean basepay is \$94,472. For the bonuses they receive, at minimum someone gets \$1,703, and at maximum someone gets \$11,293. The table below also shows the new variable created which is the Net Income, coming from the sum of the base pay and the bonus.  The mean and median for the Net income are close with the mean at \$100,939,	and the median at \$100,047.  The overall shape of the plot also looks like a normal distribution, as seen in Figure 1.
+
+
+```{r ,echo=FALSE}
+#Descriptive Statistics
+P95 <- function(x){quantile(x,0.95,na.rm=T)}
+P05 <- function(x){quantile(x,0.05,na.rm=T)}
+Table1 <- datasummary ( ( Age ) +
+                      ( BasePay ) +
+                      ( Bonus ) +
+                      ( NetIncome ) ~
+                      Mean + Median + SD + Min + Max + P05 + P95 , 
+                    data = df ,
+                    title = 'Descriptive statistics' ) %>% 
+  kable_styling ( latex_options = c ( "HOLD_position","scale_down", font_size = 2 ) )
+
+Table1
+```
+
+
+**Figure 1 - Distribution of net income**
+
+```{r,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = NetIncome  )) + 
+  ggtitle( "Distribution of Net Income" ) +
+  geom_density( colour="darkcyan" ) 
+
+```
+
+mean of net income
+```{r,echo=FALSE}
+mean(df$NetIncome)
+```
+
+quantile of NetIncome
+```{r,echo=FALSE}
+quantile(df$NetIncome)
+```
+
+
+### Gender Breakdown
+
+```{r,echo=FALSE}
+table(df$Gender)
+```
+
+### Analyzing Gender with respect to Net Income
+Here in Figure 2, The box plot shows that overall, working males have more net income compared to working females. Using the ANOVA test, we can see that there is a significant difference in net income of the two genders. However, we need to look at other factors as well.
+
+ANOVA Results
+```{r ,echo=FALSE}
+
+ANOVANetIncomeGender <- aov(NetIncome ~ Gender, data = df)
+
+summary(ANOVANetIncomeGender)
+
+```
+
+**Figure 2 - Gender vs NetIncome**
+
+```{r ,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Gender ,y = NetIncome, color = Gender  )) +
+    ggtitle( "Gender vs Net Income" ) +
+  geom_boxplot( )
+```
+
+### Analyzing Age with respect to Net Income
+
+
+**Figure 3 - Age vs Net Income**
+Here, in Figure 3, both the scatter plot and pearson correlation shows that age doesn't seem to play a significant role when it comes to a person's net income.
+
+```{r,echo=FALSE, fig.show='hide'}
+
+ggplot( data = df, aes(x = Age ,y = NetIncome,color = Gender  )) + 
+  ggtitle( "Age vs Net Income" ) +
+  geom_point( )
+```
+
+```{r,echo=FALSE }
+# Trying Pearson Correlation in addition to the scatterplot
+# https://libguides.library.kent.edu/spss/pearsoncorr
+cor(df$NetIncome,df$Age)
+```
+
+### Analyzing Education vs Net Income
+Here in Figure 4, we can see that someone with a higher education level has higher the net income, as shown in the boxplot and the ANOVA.  Looking at Figure 5, we can see that gender, education and net income analyses show that for any level of education Male have higher net income compared to the females.
+
+**Figure 4 - Education vs Net Income**
+```{r,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Education ,y = NetIncome, color = Education)) + 
+  ggtitle('Education vs. Net Income') +
+  geom_boxplot()
+```
+
+ANOVA Results
+
+```{r,echo=FALSE }
+# anova results conclude that level of education plays role in deciding the net income
+
+ANOVANetIncomeEducation <- aov(NetIncome ~ Education, data = df)
+
+summary(ANOVANetIncomeEducation)
+```
+
+**Figure 5 - Education vs Net Income vs Gender**
+
+```{r,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Education ,y = NetIncome,color = Gender  )) + 
+  ggtitle('Education vs Net Income vs Gender') +
+  geom_boxplot( )
+```
+
+
+### Analyzing Department vs Net Income
+The Figure 6 box plot shows that there's some slight differences in salaries for different departments, while the anova results show that different departments have different pay. While in Figure 7, we can see that in all the departments Male are paid more than females. 
+
+**Figure 6 - Department vs Net Income**
+```{r ,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Dept ,y = NetIncome, color = Dept)) + 
+  ggtitle('Department vs Net Income') +
+  geom_boxplot( )
+```
+
+```{r ,echo=FALSE}
+ANOVANetIncomeDept <- aov(NetIncome ~ Dept, data = df)
+
+summary(ANOVANetIncomeDept)
+```
+
+
+**Figure 7 - Department vs Net Income vs Gender**
+
+```{r,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Dept ,y = NetIncome,color = Gender  )) + 
+  ggtitle('Department vs Net Income vs Gender') +
+  geom_boxplot( )
+```
+
+### Analyzing Seniority vs Net Income
+In Figure 8, we'll see that the higher the seniority the higher the pay, as also concluded with the ANOVA result.s
+ANOVA Results.  Figure 9 box plot shows that being more senior means more salary in all the seniority levels and males are paid more than females.
+
+```{r ,echo=FALSE}
+ANOVANetIncomeSeniority <- aov(NetIncome ~ Seniority, data = df)
+
+summary(ANOVANetIncomeSeniority)
+```
+
+**Figure 8 - Seniority vs NetIncome**
+```{r ,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Seniority ,y = NetIncome, color = Seniority)) + 
+  ggtitle('Seniority vs Net Income') +
+  geom_boxplot( )
+```
+
+**Figure 9 - Seniority vs NetIncome**
+```{r ,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Seniority ,y = NetIncome,color = Gender  )) + 
+  ggtitle('Seniority vs Net Income vs Gender')
+  geom_boxplot( )
+```
+
+
+```{r ,echo=FALSE}
+## Train Test data division 80-20
+set.seed(100)
+n = nrow(df)
+trainIndex = sample(1:n, size = round(0.8*n), replace=FALSE)
+train = df[trainIndex ,]
+test = df[-trainIndex ,]
+```
+
+
+### Regression Models
+
+#### Formulas for four linear regression models
+
+$$NetIncome=\beta_0+\beta_1(Gender) $$
+$$NetIncome=\beta_0+\beta_1(Gender)+\beta_2(Education) $$
+$$NetIncome=\beta_0+\beta_1(Gender)+\beta_2(Education)+\beta_3(Dept) $$
+$$NetIncome=\beta_0+\beta_1(Gender)+\beta_2(Education)+\beta_3(Dept)+\beta_4(Seniority) $$
+```{r ,echo=FALSE}
+Formula1 = as.formula(NetIncome~Gender)
+Formula2 = as.formula(NetIncome~Gender+Education)
+Formula3 = as.formula(NetIncome~Gender+Education+Dept)
+Formula4 = as.formula(NetIncome~Gender+Education+Dept+Seniority)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+## Appendix
+Summary of Data
+```{r , echo=FALSE}
+summary(df)
+```
+
+Data Format
+```{r, echo=FALSE, message = FALSE}
+s = str(df)
+```
+
+```{r,echo=FALSE}
+# Net Income Distribution 
+ggplot( data = df, aes(x = NetIncome  )) + 
+   ggtitle( "Figure 1: Net Income Distribution" ) +
+  geom_density( colour="darkcyan" ) 
+
+
+```
+
+```{r ,echo=FALSE}
+#Gender vs Net Income Boxplot
+ggplot( data = df, aes(x = Gender ,y = NetIncome, color = Gender  )) +
+    ggtitle( "Figure 2: Gender vs Net Income" ) +
+  geom_boxplot( )
+```
+
+```{r,echo=FALSE}
+# Age vs Net Income Scatterplot
+ggplot( data = df, aes(x = Age ,y = NetIncome,color = Gender  )) + 
+  ggtitle( "Figure 3: Age vs Net Income" ) +
+  geom_point( )
+```
+
+```{r,echo=FALSE}
+ggplot( data = df, aes(x = Education ,y = NetIncome, color = Education)) + 
+  ggtitle('Figure 4: Education vs. Net Income') +
+  geom_boxplot()
+```
+
+```{r,echo=FALSE }
+ggplot( data = df, aes(x = Education ,y = NetIncome,color = Gender  )) + 
+  ggtitle('Figure 5Education vs Net Income vs Gender') +
+  geom_boxplot( )
+```
+
+```{r ,echo=FALSE}
+ggplot( data = df, aes(x = Dept ,y = NetIncome, color = Dept)) + 
+  ggtitle('Figure 6: Department vs Net Income') +
+  geom_boxplot( )
+```
+
+```{r,echo=FALSE }
+ggplot( data = df, aes(x = Dept ,y = NetIncome,color = Gender  )) + 
+  ggtitle('Figure 7: Department vs Net Income vs Gender') +
+  geom_boxplot( )
+```
+
+```{r ,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Seniority ,y = NetIncome, color = Seniority)) + 
+  ggtitle('Figure 8: Seniority vs Net Income') +
+  geom_boxplot( )
+```
+
+```{r ,echo=FALSE, fig.show='hide'}
+ggplot( data = df, aes(x = Seniority ,y = NetIncome,color = Gender  )) + 
+  ggtitle('Figure 9: Seniority vs Net Income vs Gender')
+  geom_boxplot( )
+```
+
 
 
