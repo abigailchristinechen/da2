@@ -43,3 +43,19 @@ df <- read_csv('https://github.com/abigailchristinechen/da2/blob/main/term_proje
 How much do working women make compared to working men? Do we have analytical evidence surrounding the issue of salary inequality? What causes these inequalities? How is pay affected by various factors as seen in Glassdoor? How does seniority affect the wage? Can working women bridge the wage gap by getting more education?
 
 
+## Introduction
+
+According to the Workplace Gender Equality Agency (WGEA), the gender pay gap measures the difference between the average earnings of women and men in the workforce. This is an internationally established measure of working women’s position in our  economy in comparison to working men. This project aims to explore the relationship between salary and gender based on the data from Glassdoor using regression analysis.  For pay we will be looking at the net income and the bonus pay. Additionally, other factors such as age, seniority, level of education of an individual will also be taken into account. 
+
+
+## Motivation
+
+According to the Workplace Gender Equality Agency (WGEA), the gender pay gap is influenced by a number of factors, including: conscious and unconscious discrimination and bias in hiring and pay decisions. women and men working in different industries and different jobs, with female-dominated industries and jobs attracting lower wages and high rates of part-time work for women.
+
+Equality whether, socially, legally, mentally and even financially on the bases of gender are basic human rights, it's meant to be a equal for everyone. This is important in sending a positive message about an organization's values that are aligned with creating compensation systems that are transparent, fair and rewarding.  This can then lead to attracting better employees, improving employee retention, and building a healthy company culture.  
+
+
+
+
+
+
