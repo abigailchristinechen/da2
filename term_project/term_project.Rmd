@@ -38,3 +38,8 @@ options(scipen=999)
 df <- read_csv('https://github.com/abigailchristinechen/da2/blob/main/term_project/data/Glassdoor_data.csv')
 ```
 
+## Research Questions
+
+How much do working women make compared to working men? Do we have analytical evidence surrounding the issue of salary inequality? What causes these inequalities? How is pay affected by various factors as seen in Glassdoor? How does seniority affect the wage? Can working women bridge the wage gap by getting more education?
+
+
